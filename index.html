@@ -1,195 +1,114 @@
-import random
-import time
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>寒霜啟示錄：流浪狗大冒險</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e2f;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        h1 {
+            color: #ffcc00;
+            margin-bottom: 5px;
+        }
+        #status-bar {
+            background-color: #2b2b40;
+            padding: 15px 25px;
+            border-radius: 8px;
+            display: flex;
+            gap: 20px;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        #game-container {
+            background-color: #2b2b40;
+            width: 100%;
+            max-width: 600px;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        }
+        #console-log {
+            background-color: #12121c;
+            height: 180px;
+            border-radius: 6px;
+            padding: 15px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 1rem;
+            color: #a6e3a1;
+            margin-bottom: 20px;
+            border: 1px solid #444;
+        }
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        button {
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-align: left;
+        }
+        button:hover {
+            background-color: #4338ca;
+        }
+        button.bad {
+            background-color: #dc2626;
+        }
+        button.bad:hover {
+            background-color: #b91c1c;
+        }
+    </style>
+</head>
+<body>
 
+    <h1>🐕 寒霜啟示錄：流浪狗大冒險</h1>
+    
+    <div id="status-bar">
+        <div>🦴 骨頭幣: <span id="coins">10</span></div>
+        <div>✨ 善惡值: <span id="karma">50</span></div>
+        <div>🚨 通緝度: <span id="wanted">安全</span></div>
+        <div>🐾 隊伍: <span id="pack">孤身一人</span></div>
+    </div>
 
-class DogGame:
-    def __init__(self):
-        self.bone_coins = 10      # 骨頭幣
-        self.karma = 50           # 善惡值 (0-100)
-        self.wanted_level = 0     # 通緝度 (0-3 星)
-        self.pack = []            # 狗狗隊伍
+    <div id="game-container">
+        <div id="console-log">歡迎來到流浪狗冒險！請選擇你的行動...<br></div>
+        <div id="actions" class="btn-group">
+            <button onclick="playMission(1)">🍖 任務 1：燒肉攤的香腸（飢餓小黃狗）</button>
+            <button onclick="playMission(2)">🧱 任務 2：救援被困在鐵網的小花狗</button>
+            <button onclick="playMission(3)">🧺 任務 3：公園野餐大劫案</button>
+            <button onclick="playMission(4)">🛒 前往狗狗裝飾商店</button>
+        </div>
+    </div>
 
-    def clear_screen(self):
-        print("\n" + "="*50 + "\n")
+    <script>
+        let state = {
+            coins: 10,
+            karma: 50,
+            wanted: 0,
+            pack: []
+        };
 
-    def show_status(self):
-        print(f"🐾 [主角狀態] 骨頭幣: 🦴 {self.bone_coins} | 善惡值: ✨ {self.karma} | 奶蛙通緝度: 🚨 {'⭐' * self.wanted_level if self.wanted_level > 0 else '安全'}")
-        print(f"🐕 [狗狗小隊 ({len(self.pack)}隻)]:", ", ".join(self.pack) if self.pack else "目前孤身一人")
-        print("-" * 50)
-
-    def start_game(self):
-        print("🎮 歡迎來到【寒霜啟示錄：流浪狗大冒險】像素風文字版！")
-        print("在這裡，你是一隻聰明的小狗，帶領著夥伴們在城市中執行任務、對抗奶蛙捕狗大隊！\n")
-        time.sleep(1)
-        
-        while True:
-            self.show_status()
-            print("請選擇你要進行的任務：")
-            print("1. 任務 1：燒肉攤的香腸 (飢餓的小黃狗)")
-            print("2. 任務 2：被困在鐵網後的小花狗")
-            print("3. 任務 3：公園野餐大劫案")
-            print("4. 任務 4：惡貓幫領地保衛戰")
-            print("5. 檢查隊伍與裝飾商店")
-            print("6. 結束遊戲")
+        function updateUI() {
+            document.getElementById("coins").textContent = state.coins;
+            document.getElementById("karma").textContent = state.karma;
+            document.getElementById("pack").textContent = state.pack.length > 0 ? state.pack.join(", ") : "孤身一人";
             
-            choice = input("\n請輸入選項代號 (1-6)：").strip()
-            
-            if choice == '1':
-                self.mission_bbq()
-            elif choice == '2':
-                self.mission_fence()
-            elif choice == '3':
-                self.mission_picnic()
-            elif choice == '4':
-                self.mission_cat_war()
-            elif choice == '5':
-                self.shop_and_pack()
-            elif choice == '6':
-                print("🐾 感謝遊玩！下次再見汪！")
-                break
-            else:
-                print("❌ 無效的選擇，請重新輸入！")
-            
-            # 檢查通緝危機
-            if self.wanted_level >= 3:
-                self.trigger_naigwa_boss()
-
-    def mission_bbq(self):
-        self.clear_screen()
-        print("🍖 【任務 1：燒肉攤的香腸】")
-        print("你發現了一攤肚子餓到發抖的小黃狗，隔壁是香噴噴的燒肉攤。")
-        print("1. [Good 路線] 幫忙抓後巷的老鼠，老闆開心獎勵大骨頭與香腸分給小黃狗。")
-        print("2. [Bad 路線] 直接撞翻桌子硬搶香腸！")
-        
-        action = input("請選擇行動 (1 或 2)：").strip()
-        if action == '1':
-            print("✨ 你展現身手幫老闆抓了老鼠！老闆大方送你大骨頭！")
-            self.bone_coins += 15
-            self.karma += 10
-            if "小黃狗" not in self.pack:
-                self.pack.append("小黃狗")
-                print("🎉 飢餓的小黃狗覺得你超酷，決定加入你的隊伍！")
-        elif action == '2':
-            print("💥 你撞翻桌子搶走香腸！小黃狗覺得你很兇猛但跟著你，善惡值下降，觸發奶蛙警報！")
-            self.bone_coins += 20
-            self.karma -= 15
-            self.wanted_level += 1
-            if "小黃狗" not in self.pack:
-                self.pack.append("小黃狗")
-        else:
-            print("❌無效選擇，錯失機會。")
-        input("\n按 Enter 鍵繼續...")
-
-    def mission_fence(self):
-        self.clear_screen()
-        print("🧱 【任務 2：被困在鐵網後的小花狗】")
-        print("有一隻小花狗被卡在工地的圍欄裡，急需救援。")
-        print("1. [Good 路線] 冷靜解謎：推旁邊的垃圾桶當踏板，或按按鈕開啟自動門救出牠。")
-        print("2. [Bad 路線] 暴力破壞：咬傷路過的管理員奪取鑰匙，管理員立刻叫奶蛙捕狗隊！")
-        
-        action = input("請選擇行動 (1 或 2)：").strip()
-        if action == '1':
-            print("🧠 你成功運用智慧打開自動門救出小花狗！")
-            self.bone_coins += 10
-            self.karma += 15
-            if "小花狗" not in self.pack:
-                self.pack.append("小花狗")
-                print("🎉 小花狗感動加入隊伍！")
-        elif action == '2':
-            print("🚨 你咬傷了管理員拿到鑰匙，驚動了奶蛙捕狗隊！")
-            self.wanted_level += 2
-            self.karma -= 20
-            if "小花狗" not in self.pack:
-                self.pack.append("小花狗")
-        else:
-            print("❌ 無效選擇。")
-        input("\n按 Enter 鍵繼續...")
-
-    def mission_picnic(self):
-        self.clear_screen()
-        print("🧺 【任務 3：公園野餐大劫案】")
-        print("草地上有一群正在野餐的人類，旁邊有一隻想吃三明治的柴犬 NPC。")
-        print("1. [Good 路線] 特技表演：在人類面前表演「接飛盤」或「翻滾」，人類覺得可愛主動分享食物。")
-        print("2. [Bad 路線] 尿尿騷擾：直接在野餐墊上尿尿驅趕人類，搶走所有食物！")
-        
-        action = input("請選擇行動 (1 或 2)：").strip()
-        if action == '1':
-            print("✨ 你的特技驚豔全場，人類開心地把三明治和骨頭分給你！")
-            self.bone_coins += 25
-            self.karma += 10
-            if "柴犬" not in self.pack:
-                self.pack.append("柴犬")
-        elif action == '2':
-            print("💦 你用惡臭戰術成功趕走人類！獲得大量食物，但通緝度上升！")
-            self.bone_coins += 30
-            self.karma -= 25
-            self.wanted_level += 1
-            if "柴犬" not in self.pack:
-                self.pack.append("柴犬")
-        else:
-            print("❌ 無效選擇。")
-        input("\n按 Enter 鍵繼續...")
-
-    def mission_cat_war(self):
-        self.clear_screen()
-        print("🐱 【任務 4：惡貓幫領地保衛戰】")
-        print("有一隻黑狗被幾隻兇猛街貓團團圍攻！")
-        if len(self.pack) >= 2:
-            print("🔥 你擁有強大的狗狗小隊，可以發動『狗狗衝鋒』！")
-            print("1. 發動狗狗衝鋒（團體戰）")
-            print("2. 單獨吠叫嚇跑貓咪")
-            choice = input("請選擇 (1 或 2)：").strip()
-            if choice == '1':
-                print("🐾 狗狗小隊集體衝鋒，把惡貓幫打得落花流水！黑狗加入！")
-                self.bone_coins += 40
-                self.karma += 20
-                if "黑狗" not in self.pack:
-                    self.pack.append("黑狗")
-            else:
-                print("🗣️ 你大聲吠叫嚇退了部分貓咪，救下了黑狗。")
-                self.bone_coins += 20
-                if "黑狗" not in self.pack:
-                    self.pack.append("黑狗")
-        else:
-            print("💡 你的隊伍人數不夠（需要至少2隻同伴），只能用『吠叫』嚇跑貓咪。")
-            self.bone_coins += 15
-            if "黑狗" not in self.pack:
-                self.pack.append("黑狗")
-        input("\n按 Enter 鍵繼續...")
-
-    def shop_and_pack(self):
-        self.clear_screen()
-        print("🛒 【狗狗裝飾商店與小隊管理】")
-        self.show_status()
-        print("1. 購買墨鏡 (消耗 20 骨頭幣)")
-        print("2. 購買紅領巾 (消耗 15 骨頭幣)")
-        print("3. 返回主選單")
-        choice = input("請選擇：").strip()
-        if choice == '1' and self.bone_coins >= 20:
-            self.bone_coins -= 20
-            print("🕶️ 成功購買墨鏡！帥氣度大增！")
-        elif choice == '2' and self.bone_coins >= 15:
-            self.bone_coins -= 15
-            print("🧣 成功購買紅領巾！充滿活力的狗狗！")
-        elif choice == '3':
-            return
-        else:
-            print("❌ 骨頭幣不足或選擇無效！")
-        input("\n按 Enter 鍵繼續...")
-
-    def trigger_naigwa_boss(self):
-        self.clear_screen()
-        print("🚨 ⚠️ 【奶蛙捕狗大隊出動！】 ⚠️ 🚨")
-        print("由於你的通緝度達到 3 星，奶蛙捕狗車開到現場發射麻醉槍！")
-        if len(self.pack) > 0:
-            print("🐾 幸好你有狗狗隊友們幫忙掩護，大家一起從巷道成功甩開追捕！")
-            self.wanted_level = 1
-        else:
-            print("💥 你孤身一人，不幸被奶蛙大隊抓走... 扣除 10 骨頭幣贖身！")
-            self.bone_coins = max(0, self.bone_coins - 10)
-            self.wanted_level = 0
-        input("\n按 Enter 鍵繼續...")
-
-if __name__ == "__main__":
-    game = DogGame()
-    game.start_game()
+            let wantedStr = "安全";
+            if (state.wanted >
